@@ -101,5 +101,12 @@ BEGIN
     RETURN status;
 END;
 $EOF$;
+
+-- CREATE TRIGGER schedoc_trg
+--    BEFORE INSERT ON ddl_history
+--    FOR EACH ROW
+--    EXECUTE PROCEDURE schedoc_trg();
+
+SELECT schedoc_start();
 $_pg_tle_$
 );

@@ -21,6 +21,17 @@ Comment are parsed and store in a table to make information easy accessible
 (1 row)
 ```
 
+## Install
+
+There is no other action to do, only CREATE EXTENSION, with CASCADE
+the dependency will be automatically created.
+
+```
+CREATE EXTENSION schedoc CASCADE;
+```
+
+## Why schedoc
+
 The final goal of the extension is to make information on column
 available to be crossed with information from other systems.
 

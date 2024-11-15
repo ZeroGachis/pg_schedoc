@@ -22,9 +22,6 @@ SELECT has_extension('schedoc');
 SELECT has_table('schedoc_column_raw');
 SELECT has_view('schedoc_column_comments');
 
-
-SELECT schedoc_start();
-
 -- create some objects non concerned by the extension
 ALTER TABLE foobar_schedoc ADD COLUMN toto int;
 CREATE INDEX ON foobar_schedoc (toto);
@@ -71,7 +68,7 @@ PREPARE unauthorized_value AS SELECT * FROM setcomm_unauthorized_value();
 SELECT throws_ok(
     'unauthorized_value',
     '22P02',
-    'invalid input value for enum data_status: "foobar"',
+    'invalid input value for enum schedoc_status: "foobar"',
     'We should get an input value error'
 );
 --
