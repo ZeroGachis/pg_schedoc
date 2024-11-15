@@ -1,0 +1,47 @@
+{
+   "name": "schedoc",
+   "abstract": "Schema documentation for PostgreSQL based on ddl_historization extension",
+   "description": "Schema documentation system based on COMMENT with json data and ddl_historization.",
+   "version": "0.0.1",
+   "maintainer": [
+      "Rodolphe Quiédeville <rodolphe@quiedeville.org>"
+   ],
+   "license": {
+      "PostgreSQL": "https://www.postgresql.org/about/licence"
+   },
+   "prereqs": {
+       "runtime": {
+           "requires": {
+               "plpgsql": 0,
+               "PostgreSQL": "12.0.0",
+               "ddl_historization": "0.0.5"
+           }
+      }
+   },
+   "provides": {
+     "schedoc": {
+       "abstract": "Schema documentation for PostgreSQL",
+       "file": "dist/schedoc",
+       "version": "0.0.1"
+     }
+   },
+   "resources": {
+      "bugtracker": {
+         "web": "https://github.com/ZeroGachis/pg_schedoc/issues"
+      },
+      "repository": {
+        "url":  "https://github.com/ZeroGachis/pg_schedoc.git",
+        "web":  "https://github.com/ZeroGachis/pg_schedoc",
+        "type": "git"
+      }
+   },
+   "generated_by": "Rodolphe Quiédeville",
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "https://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+       "documentation",
+       "schema"
+   ]
+}

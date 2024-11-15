@@ -1,0 +1,62 @@
+# .github/workflows/pgtest.yml
+name: Postgres tests
+
+on: push
+
+jobs:
+  pgtap:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ '16', '17' ]
+
+    container: pgxn/pgxn-tools
+    env:
+      PGUSER: postgres
+
+    steps:
+      - run: pg-start ${{ matrix.version }}
+      - uses: actions/checkout@main
+
+      # Basic regression test.
+      - run: pg-build-test
+
+      # Basic regression test.
+      - name: install dependency
+        run: pgxn install ddl_historization
+
+      - name: build application
+        run: make all
+
+      - name: install extension
+        run: make install
+
+      - name: create extension
+        run: >-
+          psql --host localhost --username postgres --dbname postgres \
+               -c 'CREATE EXTENSION schedoc CASCADE'
+        env:
+          PGPASSWORD: postgres
+
+      - name: Checkout pgtap
+        uses: actions/checkout@v4
+        with:
+          repository: theory/pgtap
+          path: pgtap
+          ref: v1.3.3
+
+      - name: install pgtap
+        working-directory: pgtap
+        run: make && psql --host localhost --username postgres --dbname postgres --file sql/pgtap.sql
+        env:
+          PGPASSWORD: postgres
+
+      - name: run unit tests
+        run: pg_prove --host localhost --dbname postgres --username postgres test/sql/*.sql
+        env:
+          PGPASSWORD: postgres
+
+      - name: run integration tests
+        run: pg_prove --host localhost --dbname postgres --username postgres test/*.sql
+        env:
+          PGPASSWORD: postgres
