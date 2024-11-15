@@ -14,10 +14,10 @@ TRUNCATE ddl_history;
 CREATE TABLE foobar_schedoc (id int);
 
 
-
 DROP EXTENSION IF EXISTS schedoc;
-CREATE EXTENSION schedoc;
+CREATE EXTENSION schedoc CASCADE;
 
+-- add test on schema to fail fast
 SELECT has_extension('schedoc');
 SELECT has_table('schedoc_column_raw');
 SELECT has_view('schedoc_column_comments');
@@ -25,7 +25,7 @@ SELECT has_view('schedoc_column_comments');
 
 SELECT schedoc_start();
 
--- 3
+-- create some objects non concerned by the extension
 ALTER TABLE foobar_schedoc ADD COLUMN toto int;
 CREATE INDEX ON foobar_schedoc (toto);
 
@@ -55,7 +55,9 @@ SELECT results_eq(
     'SELECT ''private''::text ',
     'We have right values in schedoc_column_comments');
 
-
+--
+-- The comment contains unauthorized value on status key
+--
 CREATE OR REPLACE FUNCTION setcomm_unauthorized_value()
 RETURNS void
     LANGUAGE plpgsql AS
@@ -92,5 +94,7 @@ SELECT throws_ok(
     'We should get an input syntax error'
 );
 
+
+COMMENT ON COLUMN foobar_schedoc.id IS NULL;
 
 ROLLBACK;
