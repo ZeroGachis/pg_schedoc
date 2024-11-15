@@ -8,13 +8,13 @@ $_pg_tle_$
 --
 --
 
-CREATE TYPE data_status AS ENUM ('public', 'private', 'legacy', 'wip');
+CREATE TYPE schedoc_status AS ENUM ('public', 'private', 'legacy', 'wip');
 
 CREATE TABLE schedoc_column_raw (
   objoid    oid,
   objsubid  oid,
   comment   jsonb,
-  status    data_status,
+  status    schedoc_status,
   PRIMARY KEY (objoid, objsubid)
 );
 
@@ -49,11 +49,11 @@ BEGIN
       NEW.objoid,
       NEW.objsubid,
       %s.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-      %s.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.data_status
+      %s.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.schedoc_status
     ) ON CONFLICT (objoid, objsubid)
     DO UPDATE SET
       comment = %s.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
-      status = %s.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::public.data_status;
+      status = %s.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::public.schedoc_status;
     RETURN NEW;
     END;
 $$', schemaname, schemaname, schemaname, schemaname, schemaname, schemaname);
@@ -106,5 +106,7 @@ $EOF$;
 --    BEFORE INSERT ON ddl_history
 --    FOR EACH ROW
 --    EXECUTE PROCEDURE schedoc_trg();
+
+SELECT schedoc_start();
 $_pg_tle_$
 );
