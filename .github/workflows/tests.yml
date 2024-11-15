@@ -21,6 +21,10 @@ jobs:
       # Basic regression test.
       - run: pg-build-test
 
+      # Basic regression test.
+      - name: install dependency
+        run: pgxn install ddl_historization
+
       - name: build application
         run: make all
 
@@ -30,7 +34,7 @@ jobs:
       - name: create extension
         run: >-
           psql --host localhost --username postgres --dbname postgres \
-               -c 'CREATE EXTENSION schedoc'
+               -c 'CREATE EXTENSION schedoc CASCADE'
         env:
           PGPASSWORD: postgres
 
