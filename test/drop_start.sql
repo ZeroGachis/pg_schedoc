@@ -13,8 +13,7 @@ TRUNCATE ddl_history;
 -- 2
 CREATE TABLE foobar_schedoc (id int);
 
-
-DROP EXTENSION IF EXISTS schedoc;
+DROP EXTENSION IF EXISTS schedoc CASCADE;
 CREATE EXTENSION schedoc CASCADE;
 
 -- add test on schema to fail fast
