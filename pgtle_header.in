@@ -1,0 +1,6 @@
+SELECT pgtle.install_extension
+(
+ 'schedoc',
+ '_EXTVERSION_',
+ 'Schema documentation based on COMMENT',
+$_pg_tle_$
