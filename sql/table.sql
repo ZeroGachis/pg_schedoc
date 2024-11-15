@@ -42,15 +42,15 @@ BEGIN
     VALUES (
       NEW.objoid,
       NEW.objsubid,
-      %s.get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-      %s.get_column_status(NEW.objoid, NEW.objsubid)::public.data_status
+      %s.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
+      %s.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.data_status
     ) ON CONFLICT (objoid, objsubid)
     DO UPDATE SET
-      comment = public.get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
-      status = public.get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::public.data_status;
+      comment = %s.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
+      status = %s.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::public.data_status;
     RETURN NEW;
     END;
-$$', schemaname, schemaname, schemaname, schemaname);
+$$', schemaname, schemaname, schemaname, schemaname, schemaname, schemaname);
 
    --
    -- Create two triggers, one for UPDATE and one for INSERT
@@ -68,7 +68,7 @@ END;
 $EOF$;
 
 
-CREATE OR REPLACE FUNCTION get_column_description(bjoid oid, bjsubid oid)
+CREATE OR REPLACE FUNCTION schedoc_get_column_description(bjoid oid, bjsubid oid)
 RETURNS text
     LANGUAGE plpgsql AS
 $EOF$
@@ -82,7 +82,7 @@ BEGIN
 END;
 $EOF$;
 
-CREATE OR REPLACE FUNCTION get_column_status(bjoid oid, bjsubid oid)
+CREATE OR REPLACE FUNCTION schedoc_get_column_status(bjoid oid, bjsubid oid)
 RETURNS text
     LANGUAGE plpgsql AS
 $EOF$
