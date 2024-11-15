@@ -8,8 +8,6 @@ BEGIN;
 
 SELECT plan(8);
 
-CREATE EXTENSION schedoc CASCADE;
-
 SELECT has_extension('schedoc');
 SELECT has_table('schedoc_column_raw');
 SELECT has_view('schedoc_column_comments');
