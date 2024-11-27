@@ -2,7 +2,7 @@
    "name": "schedoc",
    "abstract": "Schema documentation for PostgreSQL based on ddl_historization extension",
    "description": "Schema documentation system based on COMMENT with json data and ddl_historization.",
-   "version": "0.0.1",
+   "version": "0.0.2",
    "maintainer": [
       "Rodolphe Quiédeville <rodolphe@quiedeville.org>"
    ],
@@ -14,7 +14,7 @@
            "requires": {
                "plpgsql": 0,
                "PostgreSQL": "12.0.0",
-               "ddl_historization": "0.0.5"
+               "ddl_historization": "0.0.7"
            }
       }
    },
@@ -22,7 +22,7 @@
      "schedoc": {
        "abstract": "Schema documentation for PostgreSQL",
        "file": "dist/schedoc",
-       "version": "0.0.1"
+       "version": "0.0.2"
      }
    },
    "resources": {
