@@ -1,5 +1,5 @@
 comment = 'Schema automatic documentation based on ddl_historization and COMMENT'
-default_version = '0.0.2'
+default_version = 'EXTVERSION'
 relocatable = false
 module_pathname = '$libdir/pg_schedoc'
 requires = 'ddl_historization'

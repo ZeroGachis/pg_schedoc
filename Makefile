@@ -21,7 +21,7 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT)
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control
 
 clean:
 	rm -f $(PGTLEOUT) $(DIST)
@@ -42,3 +42,6 @@ $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.i
 
 dist: $(PGTLEOUT)
 	git archive --format zip --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD
+
+$(EXTENSION).control: $(EXTENSION).control.in META.json
+	sed 's,EXTVERSION,$(EXTVERSION),g; ' $< > $@;
