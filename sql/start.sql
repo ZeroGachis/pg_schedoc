@@ -1,0 +1,3 @@
+--
+--
+SELECT schedoc_start();
