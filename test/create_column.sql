@@ -1,29 +1,28 @@
 --
--- This test must fail
 --
-
+--
 SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(9);
+SELECT plan(4);
 
 TRUNCATE ddl_history;
 
 -- 2
-CREATE TABLE foobar_schedoc (id int);
+CREATE TABLE schedoc_unit_t (id int);
 
 DROP EXTENSION IF EXISTS schedoc CASCADE;
 CREATE EXTENSION schedoc CASCADE;
 
 
 -- create some objects non concerned by the extension
-ALTER TABLE foobar_schedoc ADD COLUMN toto int;
-CREATE INDEX ON foobar_schedoc (toto);
+ALTER TABLE schedoc_unit_t ADD COLUMN toto int;
+CREATE INDEX ON schedoc_unit_t (toto);
 
 --
 TRUNCATE ddl_history;
-COMMENT ON COLUMN foobar_schedoc.id IS '{"status": "private"}';
+COMMENT ON COLUMN schedoc_unit_t.id IS '{"status": "private"}';
 
 --
 SELECT results_eq(

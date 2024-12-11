@@ -9,10 +9,10 @@ BEGIN;
 SELECT plan(2);
 
 TRUNCATE ddl_history;
-TRUNCATE ddl_history_columns;
+TRUNCATE ddl_history_column;
 
 -- 2
-CREATE TABLE foobar_schedoc (id int, label text);
+CREATE TABLE schedoc_unitt (id int, label text);
 
 --
 SELECT results_eq(
@@ -22,15 +22,10 @@ SELECT results_eq(
 
 
 SELECT results_eq(
-    'SELECT count(*) FROM ddl_history_columns',
+    'SELECT count(*) FROM ddl_history_column',
     'SELECT CAST(2 as bigint)',
-    'We have 2 rows in ddl_history_columns');
+    'We have 2 rows in ddl_history_column');
 
-
-
-
-
-DROP TABLE foobar_schedoc;
-
+DROP TABLE schedoc_unitt;
 
 ROLLBACK;

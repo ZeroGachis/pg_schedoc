@@ -61,7 +61,7 @@ BEGIN
       NEW.objoid,
       NEW.objsubid,
       %s.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-      %s.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.schedoc_status,
+      %s.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.schedoc_status
     ) ON CONFLICT (objoid, objsubid)
     DO UPDATE SET
       comment = %s.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
