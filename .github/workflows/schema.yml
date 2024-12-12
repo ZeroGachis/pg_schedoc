@@ -52,6 +52,11 @@ jobs:
         env:
           PGPASSWORD: postgres
 
+      - name: start the extension
+        run: >-
+          psql --host localhost --username postgres --dbname postgres \
+               -c 'SELECT shedoc_start()'
+
       - name: Checkout pgtap
         uses: actions/checkout@v4
         with:
