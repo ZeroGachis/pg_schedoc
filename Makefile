@@ -3,6 +3,7 @@
 FILES = $(wildcard sql/*.sql)
 
 UNITTESTS = $(shell find test/sql/ -type f -name '*.sql.in' | sed -e 's/.in//')
+INTETESTS = $(shell find test/ -type f -name '*.sql.in' | sed -e 's/.in//')
 
 EXTENSION = schedoc
 
@@ -25,7 +26,7 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS)
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS)
 
 clean:
 	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)
@@ -42,6 +43,9 @@ test:
 	pg_prove -f test/sql/*.sql
 
 test/sql/%.sql: test/sql/%.sql.in
+	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
+
+test/%.sql: test/%.sql.in
 	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
 
 $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.in

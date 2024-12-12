@@ -2,3 +2,4 @@
 schedoc.control
 *.zip
 test/sql/*.sql
+test/*.sql
