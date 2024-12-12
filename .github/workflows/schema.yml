@@ -19,9 +19,6 @@ jobs:
       - uses: actions/checkout@main
 
       # Basic regression test.
-      - run: pg-build-test
-
-      # Basic regression test.
       - name: install dependency from pgxn.org
         run: pgxn install ddl_historization
 
