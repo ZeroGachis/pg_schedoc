@@ -11,7 +11,7 @@ DATA = dist/schedoc--$(EXTVERSION).sql
 
 DIST = dist/$(EXTENSION)--$(EXTVERSION).sql
 
-PGTLEOUT = dist/pgtle.$(EXTENSION)-$(EXTVERSION).sql
+PGTLEOUT = dist/pgtle.$(EXTENSION)--$(EXTVERSION).sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
