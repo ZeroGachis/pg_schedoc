@@ -30,12 +30,12 @@ BEGIN
       NEW.objoid,
       NEW.objsubid,
       @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-      @extschema@.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::public.schedoc_status,
+      @extschema@.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::@extschema@.schedoc_status,
       @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
     ) ON CONFLICT (objoid, objsubid)
     DO UPDATE SET
       comment = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
-      status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::public.schedoc_status,
+      status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::@extschema@.schedoc_status,
       is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
     ELSE
     --

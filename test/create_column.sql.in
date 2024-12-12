@@ -1,12 +1,12 @@
 --
 --
 --
-SET search_path=public,pgtap;
+SET search_path=public,pgtap,_TEST_SCHEMA_;
 
 BEGIN;
 
 DROP EXTENSION IF EXISTS schedoc CASCADE;
-CREATE EXTENSION schedoc CASCADE;
+CREATE EXTENSION schedoc WITH SCHEMA _TEST_SCHEMA_ CASCADE;
 SELECT schedoc_start();
 
 SELECT plan(3);

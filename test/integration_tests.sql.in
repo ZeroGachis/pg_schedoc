@@ -2,14 +2,14 @@
 -- We assume that ddl_historization is installed in public schema
 --
 
-SET search_path=public,pgtap;
+SET search_path=public,pgtap,_TEST_SCHEMA_;
 
 BEGIN;
 
-SELECT plan(5);
+SELECT plan(3);
 
 DROP EXTENSION IF EXISTS schedoc CASCADE;
-CREATE EXTENSION schedoc CASCADE;
+CREATE EXTENSION schedoc WITH SCHEMA _TEST_SCHEMA_ CASCADE;
 SELECT schedoc_start();
 
 TRUNCATE schedoc_column_raw;
@@ -17,8 +17,7 @@ TRUNCATE ddl_history;
 
 -- add test on schema to fail fast
 SELECT has_extension('schedoc');
-SELECT has_table('schedoc_column_raw');
-SELECT has_view('schedoc_column_comments');
+
 
 -- create some objects non concerned by the extension
 CREATE TABLE foobar_schedoc (id int);

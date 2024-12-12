@@ -1,10 +1,10 @@
-# .github/workflows/pgtest.yml
-name: Postgres tests
+# .github/workflows/schema.yml
+name: Dedicated schema
 
 on: push
 
 jobs:
-  pgtap:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -19,31 +19,40 @@ jobs:
       - uses: actions/checkout@main
 
       # Basic regression test.
-      - run: pg-build-test
-
-      # Basic regression test.
       - name: install dependency from pgxn.org
         run: pgxn install ddl_historization
 
+      - name: create schema
+        run: >-
+          psql --host localhost --username postgres --dbname postgres \
+               -c 'CREATE SCHEMA dba'
+        env:
+          PGPASSWORD: postgres
+
+      - name: create extension ddl_historization
+        run: >-
+          psql --host localhost --username postgres --dbname postgres \
+               -c 'CREATE EXTENSION ddl_historization WITH SCHEMA dba'
+        env:
+          PGPASSWORD: postgres
+
       - name: build application
-        run: make all
+        run: make TEST_SCHEMA=dba
 
       - name: install extension
         run: make install
 
-      - name: create extension
+      - name: create extension schedoc
         run: >-
           psql --host localhost --username postgres --dbname postgres \
-               -c 'CREATE EXTENSION schedoc CASCADE'
+               -c 'CREATE EXTENSION schedoc WITH SCHEMA dba'
         env:
           PGPASSWORD: postgres
 
       - name: start the extension
         run: >-
           psql --host localhost --username postgres --dbname postgres \
-               -c 'SELECT schedoc_start()'
-        env:
-          PGPASSWORD: postgres
+               -c 'SELECT dba.schedoc_start()'
 
       - name: Checkout pgtap
         uses: actions/checkout@v4
