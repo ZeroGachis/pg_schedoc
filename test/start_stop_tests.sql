@@ -8,6 +8,9 @@ BEGIN;
 
 SELECT plan(17);
 
+DROP EXTENSION IF EXISTS schedoc CASCADE;
+CREATE EXTENSION schedoc CASCADE;
+
 -- fail fast if the extension is not installed
 SELECT has_extension('schedoc');
 
