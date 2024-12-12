@@ -7,6 +7,8 @@ INTETESTS = $(shell find test/ -type f -name '*.sql.in' | sed -e 's/.in$$//')
 
 EXTENSION = schedoc
 
+TOOLSEXC = $(wildcard tools_exclusion/*.sql)
+
 EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
 	       sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
@@ -31,13 +33,18 @@ all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS)
 clean:
 	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)
 
-$(DIST): $(FILES)
+$(DIST): $(FILES) exclude.sql
 	cat sql/table.sql > $@
+	cat sql/management.sql >> $@
 	cat sql/function.sql >> $@
 	cat sql/function-stop.sql >> $@
 	cat sql/function-status.sql >> $@
+	cat exclude.sql >> $@
 	cat sql/start.sql >> $@
 	cat $@ > dist/$(EXTENSION).sql
+
+exclude.sql: $(TOOLSEXC)
+	cat $(TOOLSEXC) > exclude.sql
 
 test:
 	pg_prove -f test/sql/*.sql

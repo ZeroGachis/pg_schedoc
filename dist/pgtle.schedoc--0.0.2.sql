@@ -54,7 +54,27 @@ CREATE TABLE @extschema@.schedoc_column_log (
 --
 --
 --
+CREATE TABLE @extschema@.schedoc_table_exclusion (
+  schema_name name,
+  table_name name,
+  tag text,
+  created_at timestamp with time zone DEFAULT current_timestamp,
+  created_by text DEFAULT current_user,
+  PRIMARY KEY (schema_name, table_name)
+);
 
+CREATE TABLE @extschema@.schedoc_table_exclusion_templates (
+  schema_name name,
+  table_name name,
+  tags text[],
+  created_at timestamp with time zone DEFAULT current_timestamp,
+  created_by text DEFAULT current_user,
+  PRIMARY KEY (schema_name, table_name)
+);
+
+--
+--
+--
 CREATE VIEW @extschema@.schedoc_column_comments AS
 
     SELECT current_database() as databasename, c.relname as tablename, a.attname as columnname, status
@@ -64,6 +84,28 @@ CREATE VIEW @extschema@.schedoc_column_comments AS
 
 --
 --
+--
+--
+--
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tool(tool text)
+RETURNS text
+    LANGUAGE plpgsql AS
+$EOF$
+DECLARE
+  nbrows bigint;
+BEGIN
+   --
+   --
+   --
+   INSERT INTO @extschema@.schedoc_table_exclusion (schema_name, table_name, tag)
+   SELECT schema_name, table_name, tool FROM @extschema@.schedoc_table_exclusion_templates
+   WHERE tags @> ARRAY[tool];
+
+   SELECT count(1) FROM @extschema@.schedoc_table_exclusion WHERE tag = tool INTO nbrows;
+
+   RETURN format ('Inserted %s row(s) in schedoc_table_exclusion', nbrows);
+END;
+$EOF$;
 --
 --
 --
@@ -237,6 +279,66 @@ BEGIN
    END IF;
 END;
 $EOF$;
+--
+-- Debezium
+--
+
+INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_name, tags)
+VALUES
+
+('public', 'celery_results_taskresult', ARRAY['celery']),
+('public', 'celery_taskmeta', ARRAY['celery']),
+('public', 'celery_tasksetmeta', ARRAY['celery']),
+
+('public', 'djcelery_crontabschedule', ARRAY['celery']),
+('public', 'djcelery_intervalschedule', ARRAY['celery']),
+('public', 'djcelery_periodictask', ARRAY['celery']),
+('public', 'djcelery_taskstate', ARRAY['celery']),
+('public', 'djcelery_workerstate', ARRAY['celery']);
+--
+-- Debezium
+--
+
+INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_name, tags)
+VALUES
+
+('public', 'dbz_signal', ARRAY['debezium']),
+('public', 'dbz_heartbeat', ARRAY['debezium']);
+--
+-- Exclude tables created by Django Framework
+--
+-- https://www.djangoproject.com/
+--
+INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_name, tags)
+VALUES
+('public', 'auth_group', ARRAY['django']),
+('public', 'auth_group_permissions', ARRAY['django']),
+('public', 'auth_permissions', ARRAY['django']),
+('public', 'auth_user', ARRAY['django']),
+('public', 'auth_user_user_permissions', ARRAY['django']),
+('public', 'django_admin_log', ARRAY['django']),
+('public', 'django_content_type', ARRAY['django']),
+('public', 'django_migrations', ARRAY['django']),
+('public', 'django_session', ARRAY['django']);
+--
+-- Debezium
+--
+
+INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_name, tags)
+VALUES
+
+('public', 'procrastinate_events', ARRAY['procrastinate']),
+('public', 'procrastinate_jobs', ARRAY['procrastinate']),
+('public', 'procrastinate_periodic_defers', ARRAY['procrastinate']);
+--
+--
+--
+
+INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_name, tags)
+VALUES
+
+('public', 'tastypie_apiaccess', ARRAY['tastypie']),
+('public', 'tastypie_apikey', ARRAY['tastypie']);
 --
 -- Check the schema of installation for schedoc
 --
