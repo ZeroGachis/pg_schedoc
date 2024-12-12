@@ -2,6 +2,8 @@
 
 FILES = $(wildcard sql/*.sql)
 
+UTFILES = $(wildcard test/sql/*.sql)
+
 EXTENSION = schedoc
 
 EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
@@ -13,6 +15,8 @@ DIST = dist/$(EXTENSION)--$(EXTVERSION).sql
 
 PGTLEOUT = dist/pgtle.$(EXTENSION)--$(EXTVERSION).sql
 
+TEST_SCHEMA = public
+
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 
@@ -21,10 +25,10 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT) $(EXTENSION).control
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UTFILES)
 
 clean:
-	rm -f $(PGTLEOUT) $(DIST)
+	rm -f $(PGTLEOUT) $(DIST) $(UTFILES)
 
 $(DIST): $(FILES)
 	cat sql/table.sql > $@
@@ -36,6 +40,9 @@ $(DIST): $(FILES)
 
 test:
 	pg_prove -f test/sql/*.sql
+
+test/sql/%.sql: test/sql/%.sql.in
+	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@;
 
 $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.in
 	sed -e 's/_EXTVERSION_/$(EXTVERSION)/' pgtle_header.in > $(PGTLEOUT)
