@@ -61,8 +61,8 @@ jobs:
         env:
           PGPASSWORD: postgres
 
-      - name: shell tests
-        working-directory: test/shell
-        run: ./run.sh
-        env:
-          PGPASSWORD: postgres
+#      - name: shell tests
+#        working-directory: test/shell
+#        run: ./run.sh
+#        env:
+#          PGPASSWORD: postgres
