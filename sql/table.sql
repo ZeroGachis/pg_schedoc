@@ -28,8 +28,10 @@ CREATE TABLE @extschema@.schedoc_column_raw (
   objoid    oid,
   objsubid  oid,
   comment   jsonb,
-  is_valid  boolean DEFAULT false REFERENCES @extschema@.schedoc_valid (status) DEFERRABLE INITIALLY DEFERRED,
-  status    schedoc_status REFERENCES @extschema@.schedoc_valid_status (status) DEFERRABLE INITIALLY DEFERRED,
+--  is_valid  boolean DEFAULT false REFERENCES @extschema@.schedoc_valid (status) DEFERRABLE INITIALLY DEFERRED,
+--  status    schedoc_status REFERENCES @extschema@.schedoc_valid_status (status) DEFERRABLE INITIALLY DEFERRED,
+  is_valid  boolean DEFAULT false,
+  status    schedoc_status,
   PRIMARY KEY (objoid, objsubid)
 );
 
