@@ -55,7 +55,7 @@ jobs:
       - name: start the extension
         run: >-
           psql --host localhost --username postgres --dbname postgres \
-               -c 'SELECT schedoc_start()'
+               -c 'SELECT dba.schedoc_start()'
 
       - name: Checkout pgtap
         uses: actions/checkout@v4
