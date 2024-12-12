@@ -2,7 +2,7 @@
 
 FILES = $(wildcard sql/*.sql)
 
-UNITTESTS = $(shell find test/sql/ -type f -name '*.in' | sed -e 's/in/sql/')
+UNITTESTS = $(shell find test/sql/ -type f -name '*.sql.in' | sed -e 's/.in//')
 
 EXTENSION = schedoc
 
@@ -41,7 +41,7 @@ $(DIST): $(FILES)
 test:
 	pg_prove -f test/sql/*.sql
 
-test/sql/%.sql: test/sql/%.in
+test/sql/%.sql: test/sql/%.sql.in
 	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
 
 
