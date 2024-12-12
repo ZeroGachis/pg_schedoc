@@ -30,6 +30,7 @@ $(DIST): $(FILES)
 	cat sql/table.sql > $@
 	cat sql/function.sql >> $@
 	cat sql/function-stop.sql >> $@
+	cat sql/function-status.sql >> $@
 	cat sql/start.sql >> $@
 	cat $@ > dist/$(EXTENSION).sql
 

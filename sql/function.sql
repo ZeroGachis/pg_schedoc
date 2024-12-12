@@ -54,6 +54,7 @@ BEGIN
     END;
     $fsub$;
 
+   ALTER ROUTINE @extschema@.schedoc_trg DEPENDS ON EXTENSION schedoc;
    --
    -- Executed when a new column is created
    --
@@ -75,6 +76,7 @@ BEGIN
     END;
     $fsub$;
 
+   ALTER ROUTINE @extschema@.schedoc_column_trg DEPENDS ON EXTENSION schedoc;
    --
    -- Create triggers on INSERT
    --
@@ -84,10 +86,14 @@ BEGIN
      WHEN (NEW.ddl_tag = 'COMMENT')
      EXECUTE PROCEDURE @extschema@.schedoc_trg();
 
+   ALTER TRIGGER schedoc_comment_trg ON @extschema@.ddl_history DEPENDS ON EXTENSION schedoc;
+
    CREATE TRIGGER schedoc_column_trg
      BEFORE INSERT ON @extschema@.ddl_history_column
      FOR EACH ROW
      EXECUTE PROCEDURE @extschema@.schedoc_column_trg();
+
+   ALTER TRIGGER schedoc_column_trg ON @extschema@.ddl_history_column DEPENDS ON EXTENSION schedoc;
 
 END;
 $EOF$;
