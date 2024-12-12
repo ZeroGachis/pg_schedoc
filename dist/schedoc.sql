@@ -222,7 +222,7 @@ BEGIN
    --
    -- Remove all triggers
    --
-   IF SELECT count(*) = 2 from pg_proc where proname in ('schedoc_trg','schedoc_column_trg') THEN
+   IF (SELECT count(*) = 2 from pg_proc where proname in ('schedoc_trg','schedoc_column_trg')) THEN
      RETURN 'Extension schedoc is started';
    ELSE
      RETURN 'Extension schedoc is stopped';
