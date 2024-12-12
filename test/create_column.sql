@@ -5,6 +5,10 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
+DROP EXTENSION IF EXISTS schedoc CASCADE;
+CREATE EXTENSION schedoc CASCADE;
+SELECT schedoc_start();
+
 SELECT plan(4);
 
 TRUNCATE ddl_history;

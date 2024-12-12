@@ -23,11 +23,12 @@ Comment are parsed and store in a table to make information easy accessible
 
 ## Install
 
-There is no other action to do, only CREATE EXTENSION, with CASCADE
-the dependency will be automatically created.
+Once the extension is installed, call the function `schedoc_start()`
+to create the triggers and launch the process.
 
 ```
 CREATE EXTENSION schedoc CASCADE;
+SELECT schedoc_start();
 ```
 
 ## Why schedoc

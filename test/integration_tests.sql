@@ -6,15 +6,15 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(9);
+SELECT plan(11);
 
 TRUNCATE ddl_history;
 
--- 2
-CREATE TABLE foobar_schedoc (id int);
-
 DROP EXTENSION IF EXISTS schedoc CASCADE;
 CREATE EXTENSION schedoc CASCADE;
+SELECT schedoc_start();
+-- 2
+CREATE TABLE foobar_schedoc (id int);
 
 -- add test on schema to fail fast
 SELECT has_extension('schedoc');
@@ -26,14 +26,14 @@ ALTER TABLE foobar_schedoc ADD COLUMN toto int;
 CREATE INDEX ON foobar_schedoc (toto);
 
 --
-TRUNCATE ddl_history;
+TRUNCATE schedoc_column_raw;
 COMMENT ON COLUMN foobar_schedoc.id IS '{"status": "private"}';
 
 --
 SELECT results_eq(
     'SELECT count(*) FROM ddl_history',
     'SELECT CAST(1 as bigint)',
-    'We have 1 row in ddl_history');
+    'We have 1 rows in ddl_history');
 
 SELECT results_eq(
     'SELECT count(*) FROM schedoc_column_raw',
@@ -90,7 +90,44 @@ SELECT throws_ok(
     'We should get an input syntax error'
 );
 
+--
+-- The comment is not in JSONB format
+--
+CREATE OR REPLACE FUNCTION setcomm_wrong_format_b()
+RETURNS void
+    LANGUAGE plpgsql AS
+$EOF$
+BEGIN
+  COMMENT ON COLUMN foobar_schedoc.id IS '{"this":"is json"}';
+END;
+$EOF$;
 
+PREPARE wrong_format_b AS SELECT * FROM setcomm_wrong_format_b();
+SELECT throws_ok(
+    'wrong_format_b',
+    '22P02',
+    'invalid input syntax for type json',
+    'We should get an input syntax error'
+);
+--
+--
+--
+
+
+COMMENT ON COLUMN foobar_schedoc.id IS 'bad comment';
+
+COMMENT ON COLUMN foobar_schedoc.id IS '{"status": "private", "kt": "0/F8517A10"}';
+
+
+
+SELECT results_eq(
+    'SELECT count(*) FROM schedoc_column_raw WHERE comment->>''kt'' = ''0/F8517A10'' ',
+    'SELECT CAST(1 as bigint)',
+    'Bad comment are allowed if fixed later in the transaction');
+
+--
+-- Null comment are allowed
+--
 COMMENT ON COLUMN foobar_schedoc.id IS NULL;
 
 ROLLBACK;
