@@ -2,8 +2,8 @@
 
 FILES = $(wildcard sql/*.sql)
 
-UNITTESTS = $(shell find test/sql/ -type f -name '*.sql.in' | sed -e 's/.in//')
-INTETESTS = $(shell find test/ -type f -name '*.sql.in' | sed -e 's/.in//')
+UNITTESTS = $(shell find test/sql/ -type f -name '*.sql.in' | sed -e 's/.in$$//')
+INTETESTS = $(shell find test/ -type f -name '*.sql.in' | sed -e 's/.in$$//')
 
 EXTENSION = schedoc
 
