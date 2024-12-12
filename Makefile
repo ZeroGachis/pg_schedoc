@@ -2,7 +2,7 @@
 
 FILES = $(wildcard sql/*.sql)
 
-UTFILES = $(wildcard test/sql/*.sql)
+UNITTESTS = $(shell find test/sql/ -type f -name '*.in' | sed -e 's/in/sql/')
 
 EXTENSION = schedoc
 
@@ -25,10 +25,10 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UTFILES)
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS)
 
 clean:
-	rm -f $(PGTLEOUT) $(DIST) $(UTFILES)
+	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)
 
 $(DIST): $(FILES)
 	cat sql/table.sql > $@
@@ -41,8 +41,9 @@ $(DIST): $(FILES)
 test:
 	pg_prove -f test/sql/*.sql
 
-test/sql/%.sql: test/sql/%.sql.in
-	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@;
+test/sql/%.sql: test/sql/%.in
+	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
+
 
 $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.in
 	sed -e 's/_EXTVERSION_/$(EXTVERSION)/' pgtle_header.in > $(PGTLEOUT)
