@@ -60,3 +60,9 @@ jobs:
         run: pg_prove -v --host localhost --dbname postgres --username postgres test/*.sql
         env:
           PGPASSWORD: postgres
+
+      - name: shell tests
+        working-directory: test/shell
+        run: ./run.sh
+        env:
+          PGPASSWORD: postgres
