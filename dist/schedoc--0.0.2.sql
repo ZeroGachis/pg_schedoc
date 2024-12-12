@@ -83,7 +83,7 @@ CREATE VIEW @extschema@.schedoc_column_comments AS
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tool(tool text)
 RETURNS text
-    LANGUAGE plpgsql AS
+LANGUAGE plpgsql AS
 $EOF$
 DECLARE
   nbrows bigint;
@@ -103,6 +103,26 @@ $EOF$;
 --
 --
 --
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_is_table_excluded(tableoid oid)
+RETURNS boolean
+LANGUAGE plpgsql AS
+$EOF$
+DECLARE
+  status boolean;
+BEGIN
+    SELECT count(1) = 1
+    FROM pg_class c
+    JOIN @extschema@.schedoc_table_exclusion ste ON ste.table_name = c.relname
+    JOIN pg_namespace n ON (n.oid = c.relnamespace AND n.nspname = ste.schema_name)
+    WHERE c.oid = tableoid
+    INTO status;
+
+    RETURN status;
+END;
+$EOF$;
+--
+--
+--
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_start()
 RETURNS void
     LANGUAGE plpgsql AS
@@ -111,6 +131,7 @@ BEGIN
    --
    -- Function to manage INSERT statements
    --
+   -- This function is called by a trigger on ddl_history
    CREATE OR REPLACE FUNCTION @extschema@.schedoc_trg()
         RETURNS trigger LANGUAGE plpgsql AS $fsub$
     BEGIN
@@ -124,34 +145,36 @@ BEGIN
       @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
     );
 
-
+   IF NOT @extschema@.schedoc_is_table_excluded(NEW.objoid) THEN
    -- if the json is valid
-   IF schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON THEN
-    INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, comment, status, is_valid)
-    VALUES (
-      NEW.objoid,
-      NEW.objsubid,
-      @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-      @extschema@.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::@extschema@.schedoc_status,
-      @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
-    ) ON CONFLICT (objoid, objsubid)
-    DO UPDATE SET
-      comment = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
-      status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::@extschema@.schedoc_status,
-      is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
-    ELSE
-    --
-    -- This is not a valid json, we store it
-    --
-    INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, is_valid)
-    VALUES (
-      NEW.objoid,
-      NEW.objsubid,
-      @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
-    ) ON CONFLICT (objoid, objsubid)
-    DO UPDATE SET
-      is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
+       IF schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON THEN
+          INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, comment, status, is_valid)
+          VALUES (
+             NEW.objoid,
+             NEW.objsubid,
+             @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
+             @extschema@.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::@extschema@.schedoc_status,
+             @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
+          ) ON CONFLICT (objoid, objsubid)
+          DO UPDATE SET
+             comment = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
+             status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::@extschema@.schedoc_status,
+             is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
+       ELSE
+           --
+           -- This is not a valid json, we store it
+           --
+           INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, is_valid)
+           VALUES (
+               NEW.objoid,
+               NEW.objsubid,
+               @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
+           ) ON CONFLICT (objoid, objsubid)
+           DO UPDATE SET
+               is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
+       END IF;
     END IF;
+
     RETURN NEW;
     END;
     $fsub$;
