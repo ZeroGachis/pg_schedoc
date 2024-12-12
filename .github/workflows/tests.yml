@@ -63,6 +63,6 @@ jobs:
 
       - name: shell tests
         working-directory: test/shell
-        run: run.sh
+        run: test/shell/run.sh
         env:
           PGPASSWORD: postgres
