@@ -14,44 +14,7 @@ BEGIN
         RETURNS trigger LANGUAGE plpgsql AS $fsub$
     BEGIN
 
-    -- keep a log of all values
-    INSERT INTO @extschema@.schedoc_column_log (objoid, objsubid, comment, is_valid)
-    VALUES (
-      NEW.objoid,
-      NEW.objsubid,
-      @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid),
-      @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
-    );
-
-   IF NOT @extschema@.schedoc_is_table_excluded(NEW.objoid) THEN
-   -- if the json is valid
-       IF schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON THEN
-          INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, comment, status, is_valid)
-          VALUES (
-             NEW.objoid,
-             NEW.objsubid,
-             @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid)::jsonb,
-             @extschema@.schedoc_get_column_status(NEW.objoid, NEW.objsubid)::@extschema@.schedoc_status,
-             @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
-          ) ON CONFLICT (objoid, objsubid)
-          DO UPDATE SET
-             comment = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
-             status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::@extschema@.schedoc_status,
-             is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
-       ELSE
-           --
-           -- This is not a valid json, we store it
-           --
-           INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, is_valid)
-           VALUES (
-               NEW.objoid,
-               NEW.objsubid,
-               @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON
-           ) ON CONFLICT (objoid, objsubid)
-           DO UPDATE SET
-               is_valid = @extschema@.schedoc_get_column_description(NEW.objoid, NEW.objsubid) IS JSON;
-       END IF;
-    END IF;
+    PERFORM @extschema@.schedoc_fill_raw(NEW.objoid, NEW.objsubid);
 
     RETURN NEW;
     END;
@@ -66,6 +29,7 @@ BEGIN
     BEGIN
     --
     --
+    IF NOT @extschema@.schedoc_is_table_excluded(NEW.attrelid) THEN
     INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, is_valid)
     VALUES (
       NEW.attrelid,
@@ -74,7 +38,7 @@ BEGIN
     ) ON CONFLICT (objoid, objsubid)
     DO UPDATE SET
       is_valid = false;
-
+    END IF;
     RETURN NEW;
     END;
     $fsub$;
@@ -100,6 +64,58 @@ BEGIN
 
 END;
 $EOF$;
+--
+-- schedoc_fill_raw
+--
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_fill_raw(p_oid oid, p_subid oid)
+RETURNS void
+    LANGUAGE plpgsql AS
+$EOF$
+BEGIN
+    --
+    --
+    -- keep a log of all values
+    INSERT INTO @extschema@.schedoc_column_log (objoid, objsubid, comment, is_valid)
+    VALUES (
+        p_oid,
+        p_subid,
+        @extschema@.schedoc_get_column_description(p_oid, p_subid),
+        @extschema@.schedoc_get_column_description(p_oid, p_subid) IS JSON
+    );
+
+    IF NOT @extschema@.schedoc_is_table_excluded(p_oid) THEN
+       -- if the json is valid
+       IF schedoc_get_column_description(p_oid, p_subid) IS JSON THEN
+          INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, comment, status, is_valid)
+          VALUES (
+             p_oid,
+             p_subid,
+             @extschema@.schedoc_get_column_description(p_oid, p_subid)::jsonb,
+             @extschema@.schedoc_get_column_status(p_oid, p_subid)::@extschema@.schedoc_status,
+             @extschema@.schedoc_get_column_description(p_oid, p_subid) IS JSON
+          ) ON CONFLICT (objoid, objsubid)
+          DO UPDATE SET
+             comment = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid)::jsonb,
+             status = @extschema@.schedoc_get_column_status(EXCLUDED.objoid, EXCLUDED.objsubid)::@extschema@.schedoc_status,
+             is_valid = @extschema@.schedoc_get_column_description(p_oid, p_subid) IS JSON;
+       ELSE
+           --
+           -- This is not a valid json, we store it
+           --
+           INSERT INTO @extschema@.schedoc_column_raw (objoid, objsubid, is_valid)
+           VALUES (
+               p_oid,
+               p_subid,
+               @extschema@.schedoc_get_column_description(p_oid, p_subid) IS JSON
+           ) ON CONFLICT (objoid, objsubid)
+           DO UPDATE SET
+               is_valid = @extschema@.schedoc_get_column_description(EXCLUDED.objoid, EXCLUDED.objsubid) IS JSON;
+       END IF;
+    END IF;
+END;
+$EOF$;
+
+
 
 --
 --

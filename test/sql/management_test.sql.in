@@ -5,13 +5,12 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(13);
+SELECT plan(14);
 
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_exclude_tool'::name, ARRAY['text']);
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_exclude_tools_all'::name);
-
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_is_table_excluded'::name, ARRAY['oid']);
-
+SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_init_existing_comments'::name);
 --
 -- Return False on non existing id
 --

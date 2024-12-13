@@ -86,3 +86,17 @@ $EOF$;
 --
 --
 --
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_init_existing_comments()
+RETURNS void
+LANGUAGE plpgsql AS
+$EOF$
+DECLARE
+  status boolean;
+BEGIN
+
+    PERFORM @extschema@.schedoc_fill_raw(objoid, objsubid)
+    FROM @extschema@.schedoc_column_existing_comments
+    WHERE description IS NOT NULL;
+
+END;
+$EOF$;

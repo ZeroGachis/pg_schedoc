@@ -47,7 +47,7 @@ $(DIST): $(FILES) exclude.sql
 exclude.sql: $(TOOLSEXC)
 	cat $(TOOLSEXC) > exclude.sql
 
-test:
+test: $(UNITTESTS) $(INTETESTS)
 	pg_prove -f test/sql/*.sql
 
 test/sql/%.sql: test/sql/%.sql.in
