@@ -26,6 +26,9 @@ SELECT results_eq(
     'SELECT CAST(2 as bigint)',
     'We have 2 rows in schedoc_table_exclusion');
 
+TRUNCATE schedoc_column_raw;
+TRUNCATE ddl_history;
+
 -- create a table that should be excluded
 CREATE TABLE IF NOT EXISTS dbz_signal (id int);
 
@@ -34,10 +37,6 @@ SELECT results_eq(
     'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
     ARRAY['True'::boolean],
     'The table dbz_signal is excluded');
-
-TRUNCATE schedoc_column_raw;
-TRUNCATE ddl_history;
-
 
 --
 SELECT results_eq(
