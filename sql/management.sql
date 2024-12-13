@@ -1,5 +1,5 @@
 --
---
+-- Set up the exclusion list
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tool(tool text)
 RETURNS text
@@ -21,7 +21,7 @@ BEGIN
 END;
 $EOF$;
 --
---
+-- Check if a table is present in the exclusion list
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_is_table_excluded(tableoid oid)
 RETURNS boolean
@@ -30,13 +30,35 @@ $EOF$
 DECLARE
   status boolean;
 BEGIN
-    SELECT count(1) = 1
-    FROM pg_class c
-    JOIN @extschema@.schedoc_table_exclusion ste ON ste.table_name = c.relname
-    JOIN pg_namespace n ON (n.oid = c.relnamespace AND n.nspname = ste.schema_name)
-    WHERE c.oid = tableoid
-    INTO status;
+    WITH
+    excluded AS (
+      SELECT c.oid
+      FROM pg_class c
+      JOIN @extschema@.schedoc_table_exclusion ste ON ste.table_name = c.relname
+      JOIN pg_namespace n ON (n.oid = c.relnamespace AND n.nspname = ste.schema_name)
+    ),
+    internals AS (
+      SELECT oid FROM excluded
+      UNION
+      SELECT c.oid FROM pg_class c
+      JOIN pg_namespace n ON (n.oid = c.relnamespace)
+      WHERE relname IN (
+            'ddl_history',
+            'ddl_history_column',
+            'ddl_history_schema',
+            'schedoc_column_log',
+            'schedoc_column_raw',
+            'schedoc_table_exclusion',
+            'schedoc_table_exclusion_templates',
+            'schedoc_valid',
+            'schedoc_valid_status')
+            AND n.nspname = '@extschema@'
+     )
+     SELECT count(1) > 0 FROM internals WHERE oid = tableoid INTO status;
 
-    RETURN status;
+     RETURN status;
 END;
 $EOF$;
+--
+--
+--

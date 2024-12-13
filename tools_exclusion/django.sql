@@ -9,6 +9,7 @@ VALUES
 ('public', 'auth_group_permissions', ARRAY['django']),
 ('public', 'auth_permissions', ARRAY['django']),
 ('public', 'auth_user', ARRAY['django']),
+('public', 'auth_user_groups', ARRAY['django']),
 ('public', 'auth_user_user_permissions', ARRAY['django']),
 ('public', 'django_admin_log', ARRAY['django']),
 ('public', 'django_content_type', ARRAY['django']),

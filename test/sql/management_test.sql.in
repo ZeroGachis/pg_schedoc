@@ -5,8 +5,65 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(1);
+SELECT plan(11);
 
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_exclude_tool'::name, ARRAY['text']);
+
+--
+-- Return False on non existing id
+--
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(0)',
+    ARRAY['False'::boolean],
+    'Return False on non existing id');
+
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''ddl_history''',
+    ARRAY['True'::boolean],
+    'The table ddl_history is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''ddl_history_column''',
+    ARRAY['True'::boolean],
+    'The table ddl_history_column is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''ddl_history_schema''',
+    ARRAY['True'::boolean],
+    'The table ddl_history_schema is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_column_log''',
+    ARRAY['True'::boolean],
+    'The table schedoc_column_log is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_column_raw''',
+    ARRAY['True'::boolean],
+    'The table schedoc_column_raw is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_table_exclusion''',
+    ARRAY['True'::boolean],
+    'The table schedoc_table_exclusion is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_table_exclusion_templates''',
+    ARRAY['True'::boolean],
+    'The table schedoc_table_exclusion_templates is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_valid''',
+    ARRAY['True'::boolean],
+    'The table schedoc_valid is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''schedoc_valid_status''',
+    ARRAY['True'::boolean],
+    'The table schedoc_valid_status is excluded');
+
+SELECT finish();
+
 
 ROLLBACK;
