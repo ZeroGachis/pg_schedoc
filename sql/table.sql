@@ -78,3 +78,4 @@ CREATE VIEW @extschema@.schedoc_column_comments AS
 
 --
 --
+--

@@ -28,10 +28,10 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS) exclude.sql
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS)
 
 clean:
-	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)
+	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS) exclude.sql
 
 $(DIST): $(FILES) exclude.sql
 	cat sql/table.sql > $@
@@ -39,6 +39,7 @@ $(DIST): $(FILES) exclude.sql
 	cat sql/function.sql >> $@
 	cat sql/function-stop.sql >> $@
 	cat sql/function-status.sql >> $@
+	cat sql/view.sql >> $@
 	cat exclude.sql >> $@
 	cat sql/start.sql >> $@
 	cat $@ > dist/$(EXTENSION).sql

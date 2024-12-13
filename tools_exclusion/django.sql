@@ -7,7 +7,7 @@ INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_na
 VALUES
 ('public', 'auth_group', ARRAY['django']),
 ('public', 'auth_group_permissions', ARRAY['django']),
-('public', 'auth_permissions', ARRAY['django']),
+('public', 'auth_permission', ARRAY['django']),
 ('public', 'auth_user', ARRAY['django']),
 ('public', 'auth_user_groups', ARRAY['django']),
 ('public', 'auth_user_user_permissions', ARRAY['django']),

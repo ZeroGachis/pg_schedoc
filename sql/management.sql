@@ -1,4 +1,8 @@
 --
+-- schedoc_exclude_tool(tool text)
+-- schedoc_exclude_tools_all()
+-- schedoc_is_table_excluded(tableoid oid)
+--
 -- Set up the exclusion list
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tool(tool text)
@@ -16,6 +20,26 @@ BEGIN
    WHERE tags @> ARRAY[tool];
 
    SELECT count(1) FROM @extschema@.schedoc_table_exclusion WHERE tag = tool INTO nbrows;
+
+   RETURN format ('Inserted %s row(s) in schedoc_table_exclusion', nbrows);
+END;
+$EOF$;
+--
+--
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tools_all()
+RETURNS text
+LANGUAGE plpgsql AS
+$EOF$
+DECLARE
+  nbrows bigint;
+BEGIN
+   --
+   --
+   --
+   INSERT INTO @extschema@.schedoc_table_exclusion (schema_name, table_name, tag)
+   SELECT schema_name, table_name, tags[0] FROM @extschema@.schedoc_table_exclusion_templates;
+
+   SELECT count(1) FROM @extschema@.schedoc_table_exclusion INTO nbrows;
 
    RETURN format ('Inserted %s row(s) in schedoc_table_exclusion', nbrows);
 END;

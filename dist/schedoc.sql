@@ -79,6 +79,11 @@ CREATE VIEW @extschema@.schedoc_column_comments AS
 --
 --
 --
+--
+-- schedoc_exclude_tool(tool text)
+-- schedoc_exclude_tools_all()
+-- schedoc_is_table_excluded(tableoid oid)
+--
 -- Set up the exclusion list
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tool(tool text)
@@ -96,6 +101,26 @@ BEGIN
    WHERE tags @> ARRAY[tool];
 
    SELECT count(1) FROM @extschema@.schedoc_table_exclusion WHERE tag = tool INTO nbrows;
+
+   RETURN format ('Inserted %s row(s) in schedoc_table_exclusion', nbrows);
+END;
+$EOF$;
+--
+--
+CREATE OR REPLACE FUNCTION @extschema@.schedoc_exclude_tools_all()
+RETURNS text
+LANGUAGE plpgsql AS
+$EOF$
+DECLARE
+  nbrows bigint;
+BEGIN
+   --
+   --
+   --
+   INSERT INTO @extschema@.schedoc_table_exclusion (schema_name, table_name, tag)
+   SELECT schema_name, table_name, tags[0] FROM @extschema@.schedoc_table_exclusion_templates;
+
+   SELECT count(1) FROM @extschema@.schedoc_table_exclusion INTO nbrows;
 
    RETURN format ('Inserted %s row(s) in schedoc_table_exclusion', nbrows);
 END;
@@ -318,6 +343,35 @@ BEGIN
    END IF;
 END;
 $EOF$;
+DROP VIEW IF EXISTS schedoc_column_existing_comments;
+CREATE OR REPLACE VIEW schedoc_column_existing_comments AS
+
+
+    WITH descr AS (
+      SELECT c.relname, d.description
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      LEFT JOIN pg_description d ON d.objoid = c.oid
+      LEFT JOIN schedoc_table_exclusion e ON  e.table_name = c.relname
+      WHERE c.relkind = 'r' AND n.nspname='public'
+      AND  e.table_name IS NULL
+AND c.relname NOT IN (
+
+            'ddl_history',
+            'ddl_history_column',
+            'ddl_history_schema',
+            'schedoc_column_log',
+            'schedoc_column_raw',
+            'schedoc_table_exclusion',
+            'schedoc_table_exclusion_templates',
+            'schedoc_valid',
+            'schedoc_valid_status')
+    )
+    SELECT relname, description, description IS NOT NULL AND  description IS JSON as is_ok
+    FROM descr
+
+ORDER BY relname
+;
 --
 -- Debezium
 --
@@ -352,7 +406,7 @@ INSERT INTO @extschema@.schedoc_table_exclusion_templates (schema_name, table_na
 VALUES
 ('public', 'auth_group', ARRAY['django']),
 ('public', 'auth_group_permissions', ARRAY['django']),
-('public', 'auth_permissions', ARRAY['django']),
+('public', 'auth_permission', ARRAY['django']),
 ('public', 'auth_user', ARRAY['django']),
 ('public', 'auth_user_groups', ARRAY['django']),
 ('public', 'auth_user_user_permissions', ARRAY['django']),

@@ -1,0 +1,14 @@
+--
+--
+--
+SET search_path=public,pgtap;
+
+BEGIN;
+
+SELECT plan(1);
+
+SELECT has_view('public'::name, 'schedoc_column_existing_comments'::name);
+
+SELECT finish();
+
+ROLLBACK;
