@@ -1,7 +1,5 @@
 --
 --
---
-
 SET search_path=public,pgtap,_TEST_SCHEMA_;
 
 BEGIN;

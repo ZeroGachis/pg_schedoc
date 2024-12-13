@@ -53,7 +53,8 @@ test/sql/%.sql: test/sql/%.sql.in
 	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
 
 test/%.sql: test/%.sql.in
-	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
+	echo "--\n-- Auto generated file DO NOT EDIT !!" > $@
+	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< >> $@
 
 $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.in
 	sed -e 's/_EXTVERSION_/$(EXTVERSION)/' pgtle_header.in > $(PGTLEOUT)

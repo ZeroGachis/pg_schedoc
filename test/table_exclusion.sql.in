@@ -2,30 +2,39 @@
 -- We assume that ddl_historization is installed in public schema
 --
 
-SET search_path=public,pgtap,_TEST_SCHEMA_;
+SET search_path=public,pgtap,public;
 
 BEGIN;
 
-SELECT plan(1);
+SELECT plan(3);
 
 DROP EXTENSION IF EXISTS schedoc CASCADE;
 CREATE EXTENSION schedoc WITH SCHEMA public CASCADE;
 SELECT schedoc_start();
 
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
+    ARRAY['False'::boolean],
+    'The table dbz_signal is not excluded');
+
 SELECT schedoc_exclude_tool('debezium');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
+    ARRAY['True'::boolean],
+    'The table dbz_signal is excluded');
 
 TRUNCATE schedoc_column_raw;
 TRUNCATE ddl_history;
 
 -- create a table that should be excluded
-CREATE TABLE dbz_signal (id int);
-
+CREATE TABLE IF NOT EXISTS dbz_signal (id int);
 --
-
 SELECT results_eq(
     'SELECT count(*) FROM schedoc_column_raw',
     'SELECT CAST(0 as bigint)',
     'We have 0 row in schedoc_column_raw');
 
+SELECT finish();
 
 ROLLBACK;
