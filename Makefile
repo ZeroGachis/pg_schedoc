@@ -7,6 +7,8 @@ INTETESTS = $(shell find test/ -type f -name '*.sql.in' | sed -e 's/.in$$//')
 
 EXTENSION = schedoc
 
+TOOLSEXC = $(wildcard tools_exclusion/*.sql)
+
 EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
 	       sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
@@ -29,24 +31,31 @@ include $(PGXS)
 all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS)
 
 clean:
-	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)
+	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS) exclude.sql
 
-$(DIST): $(FILES)
+$(DIST): $(FILES) exclude.sql
 	cat sql/table.sql > $@
+	cat sql/management.sql >> $@
 	cat sql/function.sql >> $@
 	cat sql/function-stop.sql >> $@
 	cat sql/function-status.sql >> $@
+	cat sql/view.sql >> $@
+	cat exclude.sql >> $@
 	cat sql/start.sql >> $@
 	cat $@ > dist/$(EXTENSION).sql
 
-test:
+exclude.sql: $(TOOLSEXC)
+	cat $(TOOLSEXC) > exclude.sql
+
+test: $(UNITTESTS) $(INTETESTS)
 	pg_prove -f test/sql/*.sql
 
 test/sql/%.sql: test/sql/%.sql.in
 	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
 
 test/%.sql: test/%.sql.in
-	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
+	echo "--\n-- Auto generated file DO NOT EDIT !!" > $@
+	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< >> $@
 
 $(PGTLEOUT): dist/$(EXTENSION)--$(EXTVERSION).sql pgtle_header.in pgtle_footer.in
 	sed -e 's/_EXTVERSION_/$(EXTVERSION)/' pgtle_header.in > $(PGTLEOUT)

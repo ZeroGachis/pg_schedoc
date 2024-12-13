@@ -1,0 +1,69 @@
+--
+-- We assume that ddl_historization is installed in public schema
+--
+
+SET search_path=public,pgtap,_TEST_SCHEMA_;
+
+BEGIN;
+
+SELECT plan(7);
+
+DROP EXTENSION IF EXISTS schedoc CASCADE;
+CREATE EXTENSION schedoc WITH SCHEMA _TEST_SCHEMA_ CASCADE;
+SELECT schedoc_start();
+
+TRUNCATE schedoc_column_raw;
+TRUNCATE schedoc_column_log;
+TRUNCATE ddl_history;
+
+-- create the table before the exclusion list is loaded
+CREATE TABLE IF NOT EXISTS dbz_signal (id int);
+
+SELECT results_eq(
+    'SELECT count(*) FROM schedoc_column_raw',
+    'SELECT CAST(1 as bigint)',
+    'We have 1 row in schedoc_column_raw');
+
+SELECT results_eq(
+    'SELECT count(*) FROM schedoc_column_log',
+    'SELECT CAST(0 as bigint)',
+    'We have 0 row in schedoc_column_log');
+
+
+-- the table is not excluded by default
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
+    ARRAY['False'::boolean],
+    'The table dbz_signal is not excluded');
+
+-- load the exclusion list
+SELECT schedoc_exclude_tool('debezium');
+
+SELECT results_eq(
+    'SELECT count(*) FROM schedoc_table_exclusion',
+    'SELECT CAST(2 as bigint)',
+    'We have 2 rows in schedoc_table_exclusion');
+
+-- create a table after the exclusion list is loaded
+CREATE TABLE IF NOT EXISTS dbz_heartbeat (id int);
+
+-- Now the table is excluded
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
+    ARRAY['True'::boolean],
+    'The table dbz_signal is excluded');
+
+SELECT results_eq(
+    'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_heartbeat''',
+    ARRAY['True'::boolean],
+    'The table dbz_hearbeat is excluded');
+
+-- There is only the column id of table dbz_signal
+SELECT results_eq(
+    'SELECT count(*) FROM schedoc_column_raw',
+    'SELECT CAST(1 as bigint)',
+    'We have 1 row in schedoc_column_raw');
+
+SELECT finish();
+
+ROLLBACK;

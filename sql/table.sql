@@ -48,13 +48,24 @@ CREATE TABLE @extschema@.schedoc_column_log (
 --
 --
 --
+CREATE TABLE @extschema@.schedoc_table_exclusion (
+  schema_name name,
+  table_name name,
+  tag text,
+  created_at timestamp with time zone DEFAULT current_timestamp,
+  created_by text DEFAULT current_user,
+  PRIMARY KEY (schema_name, table_name)
+);
 
-CREATE VIEW @extschema@.schedoc_column_comments AS
+CREATE TABLE @extschema@.schedoc_table_exclusion_templates (
+  schema_name name,
+  table_name name,
+  tags text[],
+  created_at timestamp with time zone DEFAULT current_timestamp,
+  created_by text DEFAULT current_user,
+  PRIMARY KEY (schema_name, table_name)
+);
 
-    SELECT current_database() as databasename, c.relname as tablename, a.attname as columnname, status
-    FROM schedoc_column_raw ccr
-    JOIN pg_class c ON c.oid = ccr.objoid
-    JOIN pg_attribute a ON (a.attnum = ccr.objsubid AND a.attrelid = ccr.objoid);
-
+--
 --
 --

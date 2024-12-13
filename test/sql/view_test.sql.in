@@ -1,0 +1,16 @@
+--
+-- 2 views
+--
+SET search_path=public,_TEST_SCHEMA_;
+
+BEGIN;
+
+SELECT plan(2);
+
+SELECT has_view('_TEST_SCHEMA_'::name, 'schedoc_column_existing_comments'::name);
+
+SELECT has_view('_TEST_SCHEMA_'::name, 'schedoc_column_comments'::name);
+
+SELECT finish();
+
+ROLLBACK;
