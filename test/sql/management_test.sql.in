@@ -5,7 +5,7 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(12);
+SELECT plan(13);
 
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_exclude_tool'::name, ARRAY['text']);
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_exclude_tools_all'::name);
