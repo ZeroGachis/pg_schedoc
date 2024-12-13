@@ -28,7 +28,7 @@ SCHEMA = @extschema@
 
 include $(PGXS)
 
-all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS)
+all: $(DIST) $(PGTLEOUT) $(EXTENSION).control $(UNITTESTS) $(INTETESTS) exclude.sql
 
 clean:
 	rm -f $(PGTLEOUT) $(DIST) $(UNITTESTS)

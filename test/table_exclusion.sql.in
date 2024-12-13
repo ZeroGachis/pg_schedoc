@@ -12,13 +12,16 @@ DROP EXTENSION IF EXISTS schedoc CASCADE;
 CREATE EXTENSION schedoc WITH SCHEMA public CASCADE;
 SELECT schedoc_start();
 
+-- the table is not excluded by default
 SELECT results_eq(
     'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
     ARRAY['False'::boolean],
     'The table dbz_signal is not excluded');
 
+-- load the exclusion list
 SELECT schedoc_exclude_tool('debezium');
 
+-- Now the table is excluded
 SELECT results_eq(
     'SELECT schedoc_is_table_excluded(oid) FROM pg_class WHERE relname=''dbz_signal''',
     ARRAY['True'::boolean],
