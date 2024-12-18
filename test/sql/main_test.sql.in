@@ -33,7 +33,7 @@ SELECT results_eq(
 -- Tables
 --
 PREPARE count_tables AS
-SELECT count(e.extname)
+SELECT count(e.extname)::int
 FROM pg_catalog.pg_extension AS e
      INNER JOIN pg_catalog.pg_depend AS d ON (d.refobjid = e.oid)
      INNER JOIN pg_catalog.pg_class AS p ON (p.oid = d.objid)
