@@ -5,20 +5,34 @@ SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(8);
+SELECT plan(13);
 
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_column_raw'::name);
 
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_valid'::name);
+SELECT columns_are('_TEST_SCHEMA_'::name, 'schedoc_valid'::name, ARRAY['status']);
 
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_valid_status'::name);
+SELECT columns_are('_TEST_SCHEMA_'::name, 'schedoc_valid_status'::name, ARRAY['status']);
 
+--
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_column_log'::name);
 
+SELECT columns_are('_TEST_SCHEMA_'::name, 'schedoc_column_log'::name,
+       ARRAY['objoid', 'objsubid', 'comment', 'is_valid', 'created_at']);
+
+--
+--
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion'::name);
+SELECT columns_are('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion'::name,
+       ARRAY['schema_name', 'table_name', 'tag', 'created_at', 'created_by']);
 
 SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion_templates'::name);
+SELECT columns_are('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion_templates'::name,
+       ARRAY['schema_name', 'table_name', 'tags', 'created_at', 'created_by']);
 
+--
+--
 SELECT has_enum('_TEST_SCHEMA_'::name, 'schedoc_status'::name);
 
 SELECT enum_has_labels('_TEST_SCHEMA_'::name, 'schedoc_status'::name, ARRAY['public', 'private', 'legacy', 'wip']);
