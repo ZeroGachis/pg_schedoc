@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: pg_schedoc
+  description: PostgreSQL Schema documentation
+  annotations:
+    github.com/project-slug: ZeroGachis/pg_schedoc
+  tags:
+   - floss
+   - extension
+spec:
+  type: library
+  lifecycle: production
+  owner: Platform_Squad
+  system: platform
