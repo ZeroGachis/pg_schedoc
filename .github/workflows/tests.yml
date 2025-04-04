@@ -1,7 +1,11 @@
 # .github/workflows/pgtest.yml
 name: Postgres tests
 
-on: push
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'catalog-info.yaml'
 
 jobs:
   pgtap:
