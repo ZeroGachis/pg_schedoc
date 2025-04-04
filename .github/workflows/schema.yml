@@ -1,7 +1,11 @@
 # .github/workflows/schema.yml
 name: Dedicated schema
 
-on: push
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'catalog-info.yaml'
 
 jobs:
   test:
