@@ -1,0 +1,28 @@
+--
+--
+--
+SET search_path=public,pgtap;
+
+BEGIN;
+
+SELECT plan(8);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_column_raw'::name);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_valid'::name);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_valid_status'::name);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_column_log'::name);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion'::name);
+
+SELECT has_table('_TEST_SCHEMA_'::name, 'schedoc_table_exclusion_templates'::name);
+
+SELECT has_enum('_TEST_SCHEMA_'::name, 'schedoc_status'::name);
+
+SELECT enum_has_labels('_TEST_SCHEMA_'::name, 'schedoc_status'::name, ARRAY['public', 'private', 'legacy', 'wip']);
+
+SELECT finish();
+
+ROLLBACK;

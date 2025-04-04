@@ -1,3 +1,9 @@
+SELECT pgtle.install_extension
+(
+ 'schedoc',
+ '0.0.1',
+ 'Schema documentation based on COMMENT',
+$_pg_tle_$
 --
 --
 --
@@ -18,3 +24,5 @@ CREATE VIEW schedoc_column_comments AS
     FROM schedoc_column_raw ccr
     JOIN pg_class c ON c.oid = ccr.objoid
     JOIN pg_attribute a ON (a.attnum = ccr.objsubid AND a.attrelid = ccr.objoid);
+$_pg_tle_$
+);

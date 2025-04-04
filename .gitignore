@@ -1,1 +1,6 @@
 *~
+schedoc.control
+*.zip
+test/sql/*.sql
+test/*.sql
+exclude.sql

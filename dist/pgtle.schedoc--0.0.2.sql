@@ -1,3 +1,9 @@
+SELECT pgtle.install_extension
+(
+ 'schedoc',
+ '0.0.2',
+ 'Schema documentation based on COMMENT',
+$_pg_tle_$
 --
 --
 --
@@ -487,3 +493,5 @@ END;
 $check_start$;
 --
 --
+$_pg_tle_$
+);
