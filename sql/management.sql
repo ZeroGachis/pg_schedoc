@@ -58,8 +58,7 @@ BEGIN
     excluded AS (
       SELECT c.oid
       FROM pg_class c
-      JOIN @extschema@.schedoc_table_exclusion ste ON ste.table_name = c.relname
-      JOIN pg_namespace n ON (n.oid = c.relnamespace AND n.nspname = ste.schema_name)
+      JOIN @extschema@.schedoc_table_exclusion ste ON ste.table_name = c.relname)
     ),
     internals AS (
       SELECT oid FROM excluded

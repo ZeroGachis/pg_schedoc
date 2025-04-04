@@ -46,7 +46,7 @@ CREATE TABLE @extschema@.schedoc_column_log (
   created_at timestamp with time zone DEFAULT current_timestamp
 );
 --
---
+-- List the table to exclude
 --
 CREATE TABLE @extschema@.schedoc_table_exclusion (
   schema_name name,
@@ -56,7 +56,9 @@ CREATE TABLE @extschema@.schedoc_table_exclusion (
   created_by text DEFAULT current_user,
   PRIMARY KEY (schema_name, table_name)
 );
-
+--
+-- Collection of table names related to specific tools identified by tag
+--
 CREATE TABLE @extschema@.schedoc_table_exclusion_templates (
   schema_name name,
   table_name name,
@@ -65,7 +67,3 @@ CREATE TABLE @extschema@.schedoc_table_exclusion_templates (
   created_by text DEFAULT current_user,
   PRIMARY KEY (schema_name, table_name)
 );
-
---
---
---

@@ -1,5 +1,6 @@
 --
--- Remove the triggers and the functions to stop the process
+-- Return the information if the extension is started or not.
+-- If not started the has no action
 --
 CREATE OR REPLACE FUNCTION @extschema@.schedoc_status()
 RETURNS text
