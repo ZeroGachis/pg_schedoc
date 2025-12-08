@@ -61,7 +61,7 @@ jobs:
                -c 'SELECT dba.schedoc_start()'
 
       - name: Checkout pgtap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: theory/pgtap
           path: pgtap
