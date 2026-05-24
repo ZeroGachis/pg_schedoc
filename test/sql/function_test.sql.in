@@ -1,18 +1,26 @@
 --
--- We assume that ddl_historization is installed in public schema
+-- Test functions
 --
 
 SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(5);
+SELECT plan(9);
 
 SELECT has_extension('schedoc');
 
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_start'::name);
-SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_fill_raw'::name);
+SELECT function_returns('_TEST_SCHEMA_'::name, 'schedoc_start'::name, 'void');
+
+SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_fill_raw'::name, ARRAY['oid', 'oid']);
+SELECT function_returns('_TEST_SCHEMA_'::name, 'schedoc_fill_raw'::name, ARRAY['oid', 'oid'], 'void');
+
+
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_get_column_description'::name, ARRAY['oid', 'oid']);
+SELECT function_returns('_TEST_SCHEMA_'::name, 'schedoc_get_column_description'::name, ARRAY['oid', 'oid'], 'text');
+
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_get_column_status'::name, ARRAY['oid', 'oid']);
+SELECT function_returns('_TEST_SCHEMA_'::name, 'schedoc_get_column_status'::name, ARRAY['oid', 'oid'], 'text');
 
 ROLLBACK;

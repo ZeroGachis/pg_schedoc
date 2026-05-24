@@ -1,14 +1,16 @@
 --
--- We assume that ddl_historization is installed in public schema
+-- Test the function schedoc_status
 --
 SET search_path=public,pgtap;
 
 BEGIN;
 
-SELECT plan(2);
+SELECT plan(3);
 
 SELECT has_extension('schedoc');
 
 SELECT has_function('_TEST_SCHEMA_'::name, 'schedoc_status'::name);
+
+SELECT function_returns('_TEST_SCHEMA_'::name, 'schedoc_status'::name, 'text');
 
 ROLLBACK;

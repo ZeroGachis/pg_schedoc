@@ -48,7 +48,7 @@ exclude.sql: $(TOOLSEXC)
 	cat $(TOOLSEXC) > exclude.sql
 
 test: $(UNITTESTS) $(INTETESTS)
-	pg_prove -f test/sql/*.sql
+	pg_prove -vf test/sql/*.sql
 
 test/sql/%.sql: test/sql/%.sql.in
 	sed 's,_TEST_SCHEMA_,$(TEST_SCHEMA),g; ' $< > $@
